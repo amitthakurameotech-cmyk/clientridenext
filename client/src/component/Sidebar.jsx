@@ -1,25 +1,20 @@
-import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getUserdatabyid } from "../services/Auth"; // axios instance
-
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { getUserdatabyid } from "../services/Auth";
+import { FiLogOut } from "react-icons/fi";
 const Sidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
     const id = localStorage.getItem("userid");
-    //console.log(userId)
     if (id) {
-      getUserdatabyid(`/getuser/${id}`)
-        .then((res) => {
-          if (res.data.success) {
-            setUser(res.data.data);
-          }
-        })
-        //console.log(res.data)
-        .catch((err) => {
-          console.error("Failed to fetch user:", err);
-        });
+      getUserdatabyid(id)
+        .then((res) => setUser(res.data))
+        .catch((err) => console.error("Failed to fetch user:", err));
+    } else {
+      console.warn("No user ID found in localStorage");
     }
   }, []);
 
@@ -28,28 +23,36 @@ const Sidebar = () => {
       path: "/",
       label: "Dashboard",
       icon: "🏠",
-      showFor: ["driver", "passenger"],
+      showFor: ["Driver", "Passenger"],
     },
     {
       path: "/search-rides",
       label: "Search Rides",
       icon: "🔍",
-      showFor: ["driver", "passenger"],
+      showFor: ["Driver", "Passenger"],
     },
-    { path: "/post-ride", label: "Post Ride", icon: "➕", showFor: ["driver"] },
+    { path: "/post-ride", label: "Post Ride", icon: "➕", showFor: ["Driver"] },
     {
       path: "/mybooking",
       label: "My Bookings",
       icon: "📅",
-      showFor: ["passenger"],
+      showFor: ["Passenger"],
     },
     {
       path: "/profile",
       label: "Profile",
       icon: "👤",
-      showFor: ["driver", "passenger"],
+      showFor: ["Driver", "Passenger"],
     },
   ];
+
+  const handleLogout = () => {
+    localStorage.removeItem("userid");
+    localStorage.removeItem("token"); // if you're storing token
+    localStorage.removeItem("email");
+    localStorage.removeItem("FullName"); // if you're storing token
+    navigate("/login");
+  };
 
   if (!user) {
     return (
@@ -95,59 +98,28 @@ const Sidebar = () => {
         </ul>
       </nav>
 
-      {/* Account Status */}
-      <div className="px-6 py-4 border-t">
-        <h2 className="text-sm font-semibold text-gray-500 mb-2">
-          Accout Status
-        </h2>
-        <div className="space-y-2 text-sm">
-          {/* Role */}
-          <div className="flex justify-between">
-            <span>Role</span>
-            <span className="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-600">
-              {user.accountType}
+      {/* User Profile + Logout */}
+      <div className="px-6 py-4 border-t flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <div className="w-8 h-8 rounded-full bg-blue-200 flex items-center justify-center">
+            <span className="text-blue-700 font-bold">
+              {user.fullName ? user.fullName.charAt(0).toUpperCase() : "U"}
             </span>
           </div>
-
-          {/* Phone - only show if verified */}
-          {user.isVerified && user.phoneNumber && (
-            <div className="flex justify-between">
-              <span>Phone</span>
-              <span className="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-600">
-                Verified
-              </span>
-            </div>
-          )}
-
-          {/* KYC */}
-          {user.kycStatus && (
-            <div className="flex justify-between">
-              <span>KYC Status</span>
-              <span
-                className={`px-2 py-0.5 text-xs rounded-full ${
-                  user.kycStatus === "verified"
-                    ? "bg-green-100 text-green-600"
-                    : "bg-yellow-100 text-yellow-600"
-                }`}
-              >
-                {user.kycStatus}
-              </span>
-            </div>
-          )}
+          <div>
+            <p className="text-sm font-semibold text-gray-700">
+              {user.fullName}
+            </p>
+            <p className="text-xs text-gray-500">{user.email}</p>
+          </div>
         </div>
-      </div>
-
-      {/* User Profile */}
-      <div className="px-6 py-4 border-t flex items-center space-x-3">
-        <div className="w-8 h-8 rounded-full bg-blue-200 flex items-center justify-center">
-          <span className="text-blue-700 font-bold">
-            {user.fullName ? user.fullName.charAt(0).toUpperCase() : "U"}
-          </span>
-        </div>
-        <div>
-          <p className="text-sm font-semibold text-gray-700">{user.fullName}</p>
-          <p className="text-xs text-gray-500">{user.email}</p>
-        </div>
+        <button
+          onClick={handleLogout}
+          className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200"
+          title="Logout"
+        >
+          <FiLogOut size={18} />
+        </button>
       </div>
     </aside>
   );

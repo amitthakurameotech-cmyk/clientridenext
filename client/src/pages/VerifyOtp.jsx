@@ -1,29 +1,50 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaKey } from "react-icons/fa";
-import { verifyOtp } from "../services/Auth"; // make sure verifyOtp exists in Auth.js
+import { FaKey, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import { verifyOtp } from "../services/Auth";
 
 function VerifyOtp() {
-  const [phone, setPhone] = useState(""); // still capture phone
+  const [phoneNumber, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [message, setMessage] = useState("");
+  const [status, setStatus] = useState(null); // "success" | "error"
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const storedPhone = localStorage.getItem("phoneNumber");
+    if (storedPhone) setPhone(storedPhone);
+  }, []);
 
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
-    try {
-      // calling your backend service
-      const res = await verifyOtp(phone, otp);
+    if (loading) return;
+    setMessage("");
+    setStatus(null);
 
-      if (res.success) {
-        setMessage("✅ Phone Number Verified Successfully!");
-        // redirect after short delay
-        setTimeout(() => navigate("/"), 2000);
+    try {
+      setLoading(true);
+      const res = await verifyOtp(phoneNumber, otp);
+      const data = res?.data ?? res;
+
+      if (data?.success === true || data?.verified === true) {
+        setStatus("success");
+        //console.log("Phone Number Verified Successfully!");
+           alert("✅ Phone Number Verified Successfully!");
+         navigate("/login");
       } else {
-        setMessage("❌ Invalid OTP, please try again.");
+        setStatus("error");
+        setMessage(data?.message || "Invalid OTP, please try again.");
       }
     } catch (err) {
-      setMessage(err.message || "❌ OTP verification failed, try again.");
+      setStatus("error");
+      setMessage(
+        err?.response?.data?.message ||
+          err?.message ||
+          "OTP verification failed, try again."
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -35,13 +56,14 @@ function VerifyOtp() {
         </h2>
 
         <form onSubmit={handleVerifyOtp} className="space-y-5">
-          {/* Phone number input */}
+          {/* Phone input */}
           <div>
             <label className="block text-gray-700 mb-2">Phone Number</label>
             <input
-              type="tel"
+              type="text"
+              name="phoneNumber"
               placeholder="Enter phone number"
-              value={phone}
+              value={phoneNumber}
               onChange={(e) => setPhone(e.target.value)}
               required
               className="w-full border px-3 py-2 rounded-lg outline-none"
@@ -55,27 +77,39 @@ function VerifyOtp() {
               <FaKey className="text-green-500 mr-2" />
               <input
                 type="text"
+                inputMode="numeric"
+                pattern="\d{4,6}"
                 placeholder="Enter 6-digit OTP"
                 value={otp}
-                onChange={(e) => setOtp(e.target.value)}
+                onChange={(e) => setOtp(e.target.value.trim())}
                 required
                 className="w-full outline-none tracking-widest text-lg"
               />
             </div>
           </div>
 
-          {/* Submit button */}
           <button
             type="submit"
-            className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition"
+            disabled={loading}
+            className={`w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition ${
+              loading ? "opacity-60 cursor-not-allowed" : ""
+            }`}
           >
-            Submit
+            {loading ? "Verifying..." : "Submit"}
           </button>
         </form>
 
-        {/* Show message after submit */}
         {message && (
-          <p className="text-center mt-4 font-semibold text-lg">
+          <p
+            className={`flex items-center justify-center mt-4 font-semibold text-lg ${
+              status === "success" ? "text-green-600" : "text-red-600"
+            }`}
+          >
+            {status === "success" ? (
+              <FaCheckCircle className="mr-2" />
+            ) : (
+              <FaTimesCircle className="mr-2" />
+            )}
             {message}
           </p>
         )}

@@ -19,7 +19,7 @@ function Profile() {
 
  useEffect(() => {
   const fullName = localStorage.getItem("FullName");
-  const email = localStorage.getItem("user");
+  const email = localStorage.getItem("email");
 
   setUser({ fullName, email });
 }, []);

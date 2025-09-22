@@ -27,10 +27,11 @@ function SignUp() {
 
     try {
       const { confirmPassword, ...userData } = formData; // remove confirmPassword before sending
-      const response = await registerUser(userData); // API call
+      const response = await registerUser(userData);
+      localStorage.setItem("phoneNumber",response.phoneNumber) // API call
       console.log("User registered:", response);
       alert("✅ Signup successful!");
-      navigate("/"); // redirect to login page
+      navigate("/verify-otp"); // redirect to login page
     } catch (error) {
       console.error("Signup failed:", error);
       alert(error.message || "❌ Signup failed!");
@@ -84,14 +85,14 @@ function SignUp() {
           </div>
 
           {/* Phone */}
-          {/* <div>
+          <div>
             <label className="block text-gray-700 font-medium mb-2">
               Phone Number
             </label>
             <div className="flex items-center border rounded-lg px-3 py-2">
               <FaPhone className="text-green-500 mr-2" />
               <input
-                type="tel"
+                type="text"
                 name="phoneNumber"
                 placeholder="Enter your phone number"
                 value={formData.phoneNumber}
@@ -100,7 +101,7 @@ function SignUp() {
                 className="w-full outline-none"
               />
             </div>
-          </div> */}
+          </div>
 
           {/* Password */}
           <div>
@@ -152,7 +153,10 @@ function SignUp() {
         <div className="text-center mt-4">
           <p className="text-gray-600">
             Already have an account?{" "}
-            <Link to="/" className="text-blue-600 font-semibold hover:underline">
+            <Link
+              to="/"
+              className="text-blue-600 font-semibold hover:underline"
+            >
               Login
             </Link>
           </p>

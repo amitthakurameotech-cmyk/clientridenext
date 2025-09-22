@@ -30,9 +30,9 @@ export const loginUser = async (userData) => {
   }
 };
 
-export const verifyOtp = async (phone, otp) => {
+export const verifyOtp = async (phoneNumber, otp) => {
   try {
-    const res = await API.post("/verify-otp", { phone, otp });
+    const res = await API.post("/verify-otp", { phoneNumber, otp });
     return res.data;
   } catch (err) {
     throw err.response?.data || { message: "OTP verification failed" };
