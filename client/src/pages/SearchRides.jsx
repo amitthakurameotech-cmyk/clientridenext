@@ -5,7 +5,7 @@ import {
   FaDollarSign,
   FaCalendarAlt,
 } from "react-icons/fa";
-import { getallRidedata } from "../services/Auth"; // API function
+import { getallRidedata } from "../services/Api"; // API function
 import { Link, useNavigate } from "react-router-dom";
 function SearchRides() {
   const [filters, setFilters] = useState({

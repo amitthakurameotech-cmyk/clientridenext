@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { createbooking, getRideById } from "../services/Auth"; // API functions
+import { createbooking, getRideById } from "../services/Api"; // API functions
 import { FaMapMarkerAlt, FaPhone, FaUser } from "react-icons/fa";
 
 function Bookings() {

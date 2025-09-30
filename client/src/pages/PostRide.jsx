@@ -1,8 +1,14 @@
 import React, { useState } from "react";
-import { FaMapMarkerAlt, FaUsers, FaCar, FaMusic, FaBolt } from "react-icons/fa";
+import {
+  FaMapMarkerAlt,
+  FaUsers,
+  FaCar,
+  FaMusic,
+  FaBolt,
+} from "react-icons/fa";
 //import { FaPaw } from "react-icons/fa6";
 import { BsCalendarDate, BsCurrencyDollar } from "react-icons/bs";
-import { postRide } from "../services/Auth"; // import your API function
+import { postRide } from "../services/Api"; // import your API function
 
 function PostRide() {
   const [form, setForm] = useState({
@@ -33,53 +39,68 @@ function PostRide() {
     setForm({ ...form, [key]: !form[key] });
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  setError(null);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
 
-  try {
-    const driver = localStorage.getItem("userid"); // get logged-in user's ID
-    if (!driver) throw { message: "User not logged in" };
+    try {
+      const userid = localStorage.getItem("userid");
+      if (!userid) throw { message: "User not logged in" };
+//console.log(userid);
+      const rideData = {
+        ...form,
+        userid, // pass driver ID to backend
+      };
 
-    // Backend expects `driver` field (not driverId)
-    const rideData = { ...form, driver };
+      const response = await postRide(rideData);
+      console.log("Ride Posted:", response);
+      alert("✅ Ride posted successfully!");
 
-    const response = await postRide(rideData); // call API
-    console.log("Ride Posted:", response);
-    alert("✅ Ride posted successfully!");
-
-    // Reset form
-    setForm({
-      fromCity: "",
-      toCity: "",
-      pickupLocation: "",
-      dropLocation: "",
-      departureDate: "",
-      departureTime: "",
-      availableSeats: "",
-      pricePerSeat: "",
-      carModel: "",
-      smokingAllowed: false,
-      musicAllowed: true,
-      petsAllowed: false,
-      instantBooking: true,
-      notes: "",
-    });
-  } catch (err) {
-    console.error(err);
-    setError(err.message || "Failed to post ride");
-    alert(`⚠️ ${err.message || "Failed to post ride"}`);
-  } finally {
-    setLoading(false);
-  }
-};
+      // Reset form
+      setForm({
+        //userid: driver,
+        fromCity: "",
+        toCity: "",
+        pickupLocation: "",
+        dropLocation: "",
+        departureDate: "",
+        departureTime: "",
+        availableSeats: "",
+        pricePerSeat: "",
+        carModel: "",
+        smokingAllowed: false,
+        musicAllowed: true,
+        petsAllowed: false,
+        instantBooking: true,
+        notes: "",
+      });
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "Failed to post ride");
+      alert(`⚠️ ${err.message || "Failed to post ride"}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const travelPrefs = [
-    { key: "smoking", label: "Smoking Allowed", desc: "Allow smoking in the vehicle" },
-    { key: "music", label: "Music Allowed", desc: "Play music during the ride" },
+    {
+      key: "smoking",
+      label: "Smoking Allowed",
+      desc: "Allow smoking in the vehicle",
+    },
+    {
+      key: "music",
+      label: "Music Allowed",
+      desc: "Play music during the ride",
+    },
     { key: "pets", label: "Pets Allowed", desc: "Allow pets in the vehicle" },
-    { key: "instantBooking", label: "Instant Booking", desc: "Allow immediate bookings" },
+    {
+      key: "instantBooking",
+      label: "Instant Booking",
+      desc: "Allow immediate bookings",
+    },
   ];
 
   return (
@@ -240,7 +261,9 @@ function PostRide() {
 
           {/* Additional Info */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-700 mb-4">📝 Additional Information</h3>
+            <h3 className="text-lg font-semibold text-gray-700 mb-4">
+              📝 Additional Information
+            </h3>
             <textarea
               name="notes"
               placeholder="Write any additional notes here..."
@@ -267,4 +290,3 @@ function PostRide() {
 }
 
 export default PostRide;
-
