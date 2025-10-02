@@ -7,13 +7,13 @@ function Login() {
   const navigate = useNavigate();
 
   // Auto redirect if already logged in
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const uid = localStorage.getItem("userid");
-    if (token || uid) {
-      navigate("/dashboard", { replace: true });
-    }
-  }, [navigate]);
+  // useEffect(() => {
+  //   const token = localStorage.getItem("token");
+  //   const uid = localStorage.getItem("userid");
+  //   if (token || uid) {
+  //     navigate("/dashboard", { replace: true });
+  //   }
+  // }, [navigate]);
 
   const [formData, setFormData] = useState({ email: "", password: "" });
 

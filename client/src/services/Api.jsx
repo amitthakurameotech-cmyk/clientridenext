@@ -62,4 +62,52 @@ export const getbookingdata = async () => {
 	}
 };
 
+// Fetch both bookings (where user is passenger) and rides posted by user (driver) and return combined result
+export const getAllUserData = async (userId) => {
+	try {
+		const token = localStorage.getItem("token");
 
+		// Fire both requests in parallel
+		const [bookingsRes, ridesRes] = await Promise.all([
+			API.get("/getbookingdata", { headers: { Authorization: `Bearer ${token}` } }),
+			API.get(`/getdatabyid/${userId}`, { headers: { Authorization: `Bearer ${token}` } }),
+		]);
+
+		const bookings = bookingsRes?.data?.data || [];
+		const rides = Array.isArray(ridesRes?.data?.data) ? ridesRes.data.data : ridesRes?.data || [];
+
+		// Tag sources so callers can differentiate
+		const taggedBookings = bookings.map((b) => ({ ...b, __source: "booking" }));
+		const taggedRides = rides.map((r) => ({ ...r, __source: "postedRide" }));
+
+		return { bookings: taggedBookings, rides: taggedRides, combined: [...taggedBookings, ...taggedRides] };
+	} catch (err) {
+		throw err.response?.data || { message: "Failed to fetch combined user data" };
+	}
+};
+
+
+// Api.js
+export const deleteBooking = async (id) => {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await API.delete(`/deletebooking/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.data.data;
+  } catch (err) {
+    throw err.response?.data || { message: "Failed to delete booking data" };
+  }
+};
+
+export const deleteRide = async (id) => {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await API.delete(`/deleteride/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.data.data;
+  } catch (err) {
+    throw err.response?.data || { message: "Failed to delete ride data" };
+  }
+};

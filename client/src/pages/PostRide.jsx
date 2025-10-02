@@ -47,7 +47,7 @@ function PostRide() {
     try {
       const userid = localStorage.getItem("userid");
       if (!userid) throw { message: "User not logged in" };
-//console.log(userid);
+      //console.log(userid);
       const rideData = {
         ...form,
         userid, // pass driver ID to backend
@@ -205,6 +205,33 @@ function PostRide() {
               />
             </div>
           </div>
+
+          {/* Driver Info
+          <div>
+            <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+              <BsCurrencyDollar className="text-purple-500" /> Driver Information
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input
+                type="text"
+                name="fullName"
+                placeholder="FullName"
+                value={form.fullName}
+                onChange={handleChange}
+                required
+                className="border p-3 rounded-lg w-full"
+              />
+              <input
+                type="text"
+                name="phoneNumber"
+                placeholder="Phone Number"
+                value={form.phoneNumber}
+                onChange={handleChange}
+                required
+                className="border p-3 rounded-lg w-full"
+              />
+            </div>
+          </div> */}
 
           {/* Vehicle Info */}
           <div>
