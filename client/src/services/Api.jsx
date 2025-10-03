@@ -111,3 +111,57 @@ export const deleteRide = async (id) => {
     throw err.response?.data || { message: "Failed to delete ride data" };
   }
 };
+
+export const getPassengerBookings = async (userId) => {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await API.get(`/pasengertab/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.data;
+  } catch (err) {
+    throw err.response?.data || { message: "Failed to fetch passenger bookings" };
+  }
+};
+
+
+export const getDriverRides = async (userId) => {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await API.get(`/drivertab/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.data;
+  } catch (err) {
+    throw err.response?.data || { message: "Failed to fetch driver rides" };
+  }
+};
+//booking request for the driver
+export const getBookingRequests = async (userId) => {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await API.get(`/bookingrequest/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.data;
+  } catch (err) {
+    throw err.response?.data || { message: "Failed to fetch driver requests" };
+  }
+};
+
+//aprove to cancel request..
+export const approveOrCancelRequest = async (bookingId, status) => {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await API.patch(
+      `/bookings/${bookingId}`,
+      { status }, // must be "approved" or "cancelled"
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return res.data;
+  } catch (err) {
+    throw err.response?.data || { message: "Failed to update booking status" };
+  }
+};

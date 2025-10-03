@@ -24,31 +24,31 @@ const Sidebar = () => {
       path: "/",
       label: "Dashboard",
       icon: "🏠",
-      showFor: ["Driver", "Passenger"],
+      
     },
     {
       path: "/search-rides",
       label: "Search Rides",
       icon: "🔍",
-      showFor: ["Driver", "Passenger"],
+      showFor: ["User"],
     },
     {
       path: "/post-ride",
       label: "Post Ride",
       icon: "➕",
-      showFor: ["Driver", "Passenger"],
+      showFor: ["User"],
     },
     {
       path: "/mybooking",
       label: "My Bookings",
       icon: "📅",
-      showFor: ["Passenger", "Driver"],
+      showFor: ["User"],
     },
     {
       path: "/profile",
       label: "Profile",
       icon: "👤",
-      showFor: ["Driver", "Passenger"],
+      showFor: ["User"],
     },
   ];
 
@@ -57,6 +57,7 @@ const Sidebar = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("email");
     localStorage.removeItem("FullName");
+    localStorage.removeItem("recentActivity");
     navigate("/login");
     
      window.location.reload();
@@ -89,7 +90,7 @@ const Sidebar = () => {
       <nav className="flex-1 mt-4">
         <ul>
           {navItems
-            .filter((item) => item.showFor.includes(user.accountType))
+            // .filter((item) => item.showFor.includes(user.accountType))
             .map((item) => {
               const active = location.pathname === item.path;
               return (

@@ -11,7 +11,7 @@ function Login() {
   //   const token = localStorage.getItem("token");
   //   const uid = localStorage.getItem("userid");
   //   if (token || uid) {
-  //     navigate("/dashboard", { replace: true });
+  //     navigate("/dashboard");
   //   }
   // }, [navigate]);
 
@@ -53,7 +53,8 @@ function Login() {
       if (userId) localStorage.setItem("userid", userId);
 
       alert("✅ Login successful!");
-      navigate("/dashboard", { replace: true });
+      navigate("/dashboard");
+      window.location.reload();
     } catch (err) {
       console.error("Login failed:", err);
       alert(err.message || "❌ Login failed");

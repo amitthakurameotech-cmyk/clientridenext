@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Sidebar from "./component/Sidebar";
-import Header from "./component/Header";
+//import Header from "./component/Header";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import PostRide from "./pages/PostRide";
