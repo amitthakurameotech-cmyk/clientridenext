@@ -12,6 +12,10 @@ import SignUp from "./pages/SignUp";
 import SearchRides from "./pages/SearchRides";
 import Mybooking from "./pages/Mybooking";
 import HelpSupport from "./pages/HelpSupport";
+import ReportProblem from "./pages/ReportProblem";
+import CallSupport from "./pages/CallSupport";
+import LiveChat from "./pages/LiveChat";
+import Feedback from "./pages/Feedback";
 
 function AppLayout() {
   return (
@@ -30,6 +34,11 @@ function AppLayout() {
             <Route path="/search-rides" element={<SearchRides />} />
             <Route path="/mybooking" element={<Mybooking />} />
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
+           
+        <Route path="/report-problem" element={<ReportProblem />} />
+        <Route path="/call-support" element={<CallSupport />} />
+        <Route path="/live-chat" element={<LiveChat />} />
+        <Route path="/feedback" element={<Feedback />} />
           </Routes>
         </main>
       </div>

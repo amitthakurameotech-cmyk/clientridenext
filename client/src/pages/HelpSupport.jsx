@@ -8,10 +8,11 @@ import {
   FaEnvelope,
   FaStar,
 } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 function HelpSupport() {
-  // FAQ Toggle State
   const [openFAQ, setOpenFAQ] = useState(null);
+  const navigate = useNavigate();
 
   const faqs = [
     {
@@ -46,21 +47,25 @@ function HelpSupport() {
       title: "Report a Problem",
       desc: "Facing issues during booking or ride? Report here.",
       icon: <FaExclamationTriangle className="text-red-500 text-2xl" />,
+      path: "/report-problem",
     },
     {
       title: "Call Support",
       desc: "Speak directly with our support team for urgent help.",
       icon: <FaPhoneAlt className="text-green-500 text-2xl" />,
+      path: "/call-support",
     },
     {
       title: "Live Chat",
       desc: "Chat instantly with our support team.",
       icon: <FaComments className="text-purple-500 text-2xl" />,
+      path: "/live-chat",
     },
     {
       title: "Feedback",
       desc: "Help us improve by sharing your experience.",
       icon: <FaStar className="text-yellow-500 text-2xl" />,
+      path: "/feedback",
     },
   ];
 
@@ -69,7 +74,6 @@ function HelpSupport() {
       title: "How do I pay for a ride?",
       desc: "You pay the driver directly in cash after the ride. Please carry exact change if possible.",
     },
-
     {
       title: "Refund Policy",
       desc: "Full refund if cancelled within allowed time. Partial refund may apply otherwise.",
@@ -82,20 +86,17 @@ function HelpSupport() {
 
   return (
     <div className="max-w-6xl mx-auto p-8 mt-10">
-      {/* Title */}
       <h1 className="text-4xl font-bold text-center text-gray-800 mb-4">
         Help & Support
       </h1>
       <p className="text-center text-gray-600 mb-12">
-        Need assistance? We're here to help passengers and drivers every step of
-        the way.
+        Need assistance? We're here to help passengers and drivers every step of the way.
       </p>
 
       {/* FAQs */}
       <div className="mb-12">
         <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-          <FaQuestionCircle className="text-blue-500" /> Frequently Asked
-          Questions
+          <FaQuestionCircle className="text-blue-500" /> Frequently Asked Questions
         </h2>
         <div className="space-y-4">
           {faqs.map((faq, index) => (
@@ -106,9 +107,7 @@ function HelpSupport() {
             >
               <div className="flex justify-between items-center">
                 <h3 className="font-semibold text-gray-800">{faq.question}</h3>
-                <span className="text-gray-500">
-                  {openFAQ === index ? "−" : "+"}
-                </span>
+                <span className="text-gray-500">{openFAQ === index ? "−" : "+"}</span>
               </div>
               {openFAQ === index && (
                 <p className="text-gray-600 mt-2 text-sm">{faq.answer}</p>
@@ -125,7 +124,8 @@ function HelpSupport() {
           {quickActions.map((action, index) => (
             <div
               key={index}
-              className="bg-gradient-to-r from-indigo-50 via-white to-purple-50 shadow-md rounded-xl p-5 flex items-start gap-4 hover:shadow-xl hover:-translate-y-1 transition"
+              onClick={() => navigate(action.path)}
+              className="bg-gradient-to-r from-indigo-50 via-white to-purple-50 shadow-md rounded-xl p-5 flex items-start gap-4 hover:shadow-xl hover:-translate-y-1 transition cursor-pointer"
             >
               {action.icon}
               <div>
@@ -157,12 +157,8 @@ function HelpSupport() {
 
       {/* Contact Section */}
       <div className="text-center mt-16">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">
-          Still need help?
-        </h2>
-        <p className="text-gray-600 mb-6">
-          You can always reach out to us directly.
-        </p>
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">Still need help?</h2>
+        <p className="text-gray-600 mb-6">You can always reach out to us directly.</p>
         <a
           href="mailto:support@rideapp.com"
           className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl shadow-md hover:shadow-lg transition"

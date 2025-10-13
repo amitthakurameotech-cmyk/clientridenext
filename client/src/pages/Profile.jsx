@@ -20,10 +20,11 @@ function Profile() {
     let mounted = true;
     (async () => {
       try {
-        const userId = localStorage.getItem("userid");
-        if (!userId) return;
+        const userid = localStorage.getItem("userid");
+        if (!userid) return;
 
-        const res = await getUserdatabyid(userId);
+        const res = await getUserdatabyid(userid);
+       
         if (!mounted) return;
 
         const u = res?.data?.user || res?.user || res?.data || {};
@@ -31,6 +32,7 @@ function Profile() {
 
         // Prepare form values (only editable fields)
         setForm({
+          id:userid,
           phoneNumber: u.phoneNumber || "",
           city: u.city || "",
           accountType: u.accountType || "",

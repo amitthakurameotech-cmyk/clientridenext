@@ -41,11 +41,7 @@ function Login() {
         payload?.fullName ??
         response?.fullName;
       const userId =
-        user?.id ??
-        user?._id ??
-        payload?.id ??
-        payload?._id ??
-        response?.id;
+        user?.id ?? user?._id ?? payload?.id ?? payload?._id ?? response?.id;
 
       if (token) localStorage.setItem("token", token);
       if (email) localStorage.setItem("email", email);
@@ -65,7 +61,6 @@ function Login() {
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 via-white to-purple-100">
       {/* Card Container */}
       <div className="bg-white shadow-2xl rounded-2xl w-full max-w-md p-10 relative overflow-hidden">
-        
         {/* Decorative Circle */}
         <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full opacity-20"></div>
 
