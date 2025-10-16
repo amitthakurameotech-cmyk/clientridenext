@@ -43,8 +43,8 @@
 
 //         setData({
 //           bookings: bookingsRes?.bookings || [],
-//           rides: ridesRes?.rides || [], // only driver rides
-//           requests: requestsRes?.requests || [], // only bookings for driver's rides
+//           rides: ridesRes?.rides || [],
+//           requests: requestsRes?.requests || [],
 //         });
 //       } catch (err) {
 //         console.error("Error fetching data:", err);
@@ -58,7 +58,7 @@
 //       mounted = false;
 //     };
 //   }, [userId]);
-// console.log(data.bookings,"booking data")
+
 //   // Cancel Ride or Booking
 //   const handleCancel = async (item, type) => {
 //     if (!window.confirm("Are you sure you want to cancel this?")) return;
@@ -85,7 +85,6 @@
 
 //   // Approve / Reject booking request
 //   const handleRequestAction = async (bookingId, status) => {
-//     console.log(bookingId, status);
 //     try {
 //       await approveOrCancelRequest(bookingId, status);
 //       setData((prev) => ({
@@ -122,6 +121,19 @@
 //       : activeTab === "rides"
 //       ? data.rides
 //       : data.requests;
+
+//   // Status color mapping
+//   const getStatusColor = (status) => {
+//     switch (status?.toLowerCase()) {
+//       case "approved":
+//         return "bg-green-100 text-green-700 border-green-400";
+//       case "cancelled":
+//         return "bg-red-100 text-red-700 border-red-400";
+//       case "pending":
+//       default:
+//         return "bg-yellow-100 text-yellow-700 border-yellow-400";
+//     }
+//   };
 
 //   return (
 //     <div className="max-w-7xl mx-auto mt-10 p-6">
@@ -179,8 +191,19 @@
 //           {tabData.map((item) => (
 //             <div
 //               key={item._id}
-//               className="bg-white rounded-2xl shadow-md hover:shadow-2xl transition p-6 border"
+//               className="bg-white rounded-2xl shadow-md hover:shadow-2xl transition p-6 border relative"
 //             >
+//               {/* Status badge (only for passenger bookings) */}
+//               {activeTab === "bookings" && (
+//                 <span
+//                   className={`absolute top-4 right-4 text-xs font-semibold px-3 py-1 rounded-full border ${getStatusColor(
+//                     item.bookingStatus
+//                   )}`}
+//                 >
+//                   {item.bookingstatus ? item.bookingstatus.toUpperCase() : "N/A"}
+//                 </span>
+//               )}
+
 //               {/* Header */}
 //               <div className="flex justify-between items-center mb-5">
 //                 <h2 className="text-lg font-bold text-gray-700 flex items-center gap-2">
@@ -295,17 +318,21 @@ function Mybooking() {
       setLoading(true);
       try {
         const [bookingsRes, ridesRes, requestsRes] = await Promise.all([
-          getPassengerBookings(userId), // bookings as passenger
-          getDriverRides(userId), // rides posted by this driver
-          getBookingRequests(userId), // requests for this driver's rides
+          getPassengerBookings(userId),
+          getDriverRides(userId),
+          getBookingRequests(userId),
         ]);
-
         if (!mounted) return;
-
         setData({
           bookings: bookingsRes?.bookings || [],
           rides: ridesRes?.rides || [],
-          requests: requestsRes?.requests || [],
+          // Normalize and filter using any field the backend might use for status.
+          requests: (requestsRes?.requests || []).filter((r) => {
+            const status = (
+              r.bookingstatus || r.bookingStatus || r.status || ""
+            ).toString();
+            return status.trim().toLowerCase() === "pending" || status === "";
+          }),
         });
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -326,15 +353,15 @@ function Mybooking() {
     try {
       if (type === "booking") {
         await deleteBooking(item._id);
-        setData((prev) => ({
+        setData(prev => ({
           ...prev,
-          bookings: prev.bookings.filter((b) => b._id !== item._id),
+          bookings: prev.bookings.filter(b => b._id !== item._id),
         }));
       } else if (type === "ride") {
         await deleteRide(item._id);
-        setData((prev) => ({
+        setData(prev => ({
           ...prev,
-          rides: prev.rides.filter((r) => r._id !== item._id),
+          rides: prev.rides.filter(r => r._id !== item._id),
         }));
       }
       alert("Cancelled successfully!");
@@ -348,10 +375,20 @@ function Mybooking() {
   const handleRequestAction = async (bookingId, status) => {
     try {
       await approveOrCancelRequest(bookingId, status);
+
+      // Re-fetch latest requests from server to avoid stale-state issues
+      // and to ensure we reflect the backend's authoritative data.
+      const fresh = await getBookingRequests(userId);
+      const freshRequests = (fresh?.requests || []).filter((r) => {
+        const s = (r.bookingstatus || r.bookingStatus || r.status || "").toString();
+        return s.trim().toLowerCase() === "pending" || s === "";
+      });
+
       setData((prev) => ({
         ...prev,
-        requests: prev.requests.filter((r) => r._id !== bookingId),
+        requests: freshRequests,
       }));
+
       alert(`Request ${status} successfully!`);
     } catch (err) {
       console.error(err);
@@ -384,7 +421,7 @@ function Mybooking() {
       : data.requests;
 
   // Status color mapping
-  const getStatusColor = (status) => {
+  const getStatusColor = status => {
     switch (status?.toLowerCase()) {
       case "approved":
         return "bg-green-100 text-green-700 border-green-400";
@@ -449,7 +486,7 @@ function Mybooking() {
         </p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {tabData.map((item) => (
+          {tabData.map(item => (
             <div
               key={item._id}
               className="bg-white rounded-2xl shadow-md hover:shadow-2xl transition p-6 border relative"
@@ -458,10 +495,11 @@ function Mybooking() {
               {activeTab === "bookings" && (
                 <span
                   className={`absolute top-4 right-4 text-xs font-semibold px-3 py-1 rounded-full border ${getStatusColor(
-                    item.bookingStatus
+                    item.bookingStatus || item.bookingstatus
                   )}`}
                 >
-                  {item.bookingstatus ? item.bookingstatus.toUpperCase() : "N/A"}
+                  {(item.bookingStatus || item.bookingstatus)?.toUpperCase() ||
+                    "N/A"}
                 </span>
               )}
 
@@ -508,13 +546,17 @@ function Mybooking() {
               {activeTab === "requests" ? (
                 <div className="flex gap-2 mt-4">
                   <button
-                    onClick={() => handleRequestAction(item._id, "approved")}
+                    onClick={() =>
+                      handleRequestAction(item._id, "approved")
+                    }
                     className="px-4 py-2 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600"
                   >
                     Approve
                   </button>
                   <button
-                    onClick={() => handleRequestAction(item._id, "cancelled")}
+                    onClick={() =>
+                      handleRequestAction(item._id, "cancelled")
+                    }
                     className="px-4 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600"
                   >
                     Reject
@@ -542,4 +584,3 @@ function Mybooking() {
 }
 
 export default Mybooking;
-
